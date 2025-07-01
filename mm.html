@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combined Image Animation with Lazy Preloading of A Elements</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 300vh; /* Make body even taller to demonstrate lazy loading more links */
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        pre {
+            width: 80%;
+            max-width: 600px;
+            white-space: pre-wrap;
+            margin: 20px 0;
+        }
+        hr {
+            width: 80%;
+            border-color: #ccc;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: blue;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: white;
+            min-width: 150px;
+            width: 80%; /* Let 'a' tags take up more width for better visibility */
+            max-width: 400px;
+        }
+        a:hover {
+            border-color: dodgerblue;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        a[href$="/"]:first-child {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        a img {
+            width: 100%;
+            max-width: 30%; /* Image size set here */
+            height: auto;
+            border: 1px solid #eee;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            display: block;
+            margin: 5px 0;
+        }
+        a img.loaded {
+            opacity: 1;
+        }
+        .loading-message {
+            font-size: 0.7em;
+            color: #888;
+            margin-top: 5px;
+            display: block;
+        }
+        .placeholder-text {
+            height: 150px;
+            margin: 50px 0;
+            text-align: center;
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed #eee;
+            width: 80%;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Index of /26000/</h1><hr><pre>
+<a href="../">../</a>
+<a href="26003/">26003/</a>                                             21-Jun-2025 09:27                   -
+<a href="26004/">26004/</a>                                             21-Jun-2025 10:10                   -
+<a href="26005/">26005/</a>                                             21-Jun-2025 10:49   
+</pre><hr>
+
+    <p class="placeholder-text">Only the first few animation sets will preload initially. Scroll down!</p>
+
+    <a href="26006/">26006/</a>
+    <a href="26007/">26007/</a>
+    <a href="26008/">26008/</a>
+    <a href="26009/">26009/</a>
+    <a href="26010/">26010/</a>
+    <a href="26011/">26011/</a>
+    <a href="26012/">26012/</a>
+    <a href="26013/">26013/</a>
+    <a href="26014/">26014/</a>
+    <a href="26015/">26015/</a>
+    <a href="26016/">26016/</a>
+    <a href="26017/">26017/</a>
+    <a href="26018/">26018/</a>
+    <a href="26019/">26019/</a>
+    <a href="26020/">26020/</a>
+    <a href="26021/">26021/</a>
+    <a href="26022/">26022/</a>
+    <a href="26023/">26023/</a>
+    <a href="26024/">26024/</a>
+    <a href="26025/">26025/</a>
+    <a href="26026/">26026/</a>
+    <a href="26027/">26027/</a>
+    <a href="26028/">26028/</a>
+    <a href="26029/">26029/</a>
+    <a href="26030/">26030/</a>
+    <a href="26031/">26031/</a>
+    <a href="26032/">26032/</a>
+    <a href="26033/">26033/</a>
+    <a href="26034/">26034/</a>
+    <a href="26035/">26035/</a>
+    <a href="26036/">26036/</a>
+    <a href="26037/">26037/</a>
+    <a href="26038/">26038/</a>
+    <a href="26039/">26039/</a>
+    <a href="26040/">26040/</a>
+    <a href="26041/">26041/</a>
+    <a href="26042/">26042/</a>
+    <a href="26043/">26043/</a>
+    <a href="26044/">26044/</a>
+    <a href="26045/">26045/</a>
+    <a href="26046/">26046/</a>
+    <a href="26047/">26047/</a>
+    <a href="26048/">26048/</a>
+    <a href="26049/">26049/</a>
+    <a href="26050/">26050/</a>
+    <a href="26051/">26051/</a>
+    <a href="26052/">26052/</a>
+    <a href="26053/">26053/</a>
+    <a href="26054/">26054/</a>
+    <a href="26055/">26055/</a>
+    <a href="26056/">26056/</a>
+    <a href="26057/">26057/</a>
+    <a href="26058/">26058/</a>
+    <a href="26059/">26059/</a>
+    <a href="26060/">26060/</a>
+
+    <p class="placeholder-text">End of animatable content.</p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM Content Loaded. Script started.");
+
+            const allLinks = document.querySelectorAll('a[href$="/"]:not([href="../"])');
+            console.log(`Found ${allLinks.length} potential animation links.`);
+            if (allLinks.length === 0) {
+                console.error("No animatable links found. Check your 'allLinks' selector.");
+            }
+
+            const maxInitialAnimations = 3; // The first X links to observe immediately
+
+            // --- Function to handle the full animation setup for a single link ---
+            function setupAnimationForLink(linkElement) {
+                console.log(`Attempting to set up animation for link: ${linkElement.outerHTML}`);
+                if (linkElement.dataset.animatedInitialized) {
+                    console.log(`Animation already initialized for ${linkElement.href}`);
+                    return;
+                }
+                linkElement.dataset.animatedInitialized = 'true';
+
+                const href = linkElement.getAttribute('href');
+                let index2 = null;
+                const match = href.match(/^(\d+)\/$/); // Regex to capture digits before a slash at end
+                if (match && match[1]) {
+                    index2 = match[1];
+                }
+
+                if (!index2) {
+                    console.warn('Could not extract index2 from href:', href, '. Skipping animation setup for this link.');
+                    return;
+                }
+                console.log(`Extracted index2: ${index2} from href: ${href}`);
+
+
+                let index1 = index2.slice(0, 2) + "000"; // e.g., "26" + "000" = "26000"
+                const frontL = "https://tncdn.b-cdn.net/contents/videos_screenshots/";
+                const baseFramePath = frontL + index1 + "/" + index2 + "/848x480/";
+                const initialFrameName = "1.jpg";
+                const totalFrames = 60;
+                const initialLoadFrameCount = 30; // Max frames to load for a single animation initially
+
+                const loadingMessage = document.createElement('p');
+                loadingMessage.className = 'loading-message';
+                loadingMessage.textContent = `Loading initial ${initialLoadFrameCount} frames...`;
+                linkElement.appendChild(loadingMessage);
+                console.log(`Added loading message for ${index2}`);
+
+                // Image 1: Mouse Position based animation
+                const img1 = document.createElement('img');
+                img1.src = baseFramePath + initialFrameName;
+                img1.alt = `Mouse position animated image for ${index2}`;
+                img1.className = 'mouse-animated-image';
+                img1.dataset.initialAnimationSrc = baseFramePath + initialFrameName;
+                linkElement.appendChild(img1);
+                console.log(`Created img1 for ${index2}, src: ${img1.src}`);
+
+                // Image 2: Interval based animation
+                const img2 = document.createElement('img');
+                img2.src = baseFramePath + initialFrameName;
+                img2.alt = `Interval image for ${index2}`;
+                img2.className = 'interval-animated-image';
+                img2.dataset.initialAnimationSrc = baseFramePath + initialFrameName;
+                linkElement.appendChild(img2);
+                console.log(`Created img2 for ${index2}, src: ${img2.src}`);
+
+                const preloadedImages = new Array(totalFrames);
+                let initialImagesLoadedCount = 0;
+                let fullPreloadStarted = false;
+
+                console.log(`Starting initial preload for ${initialLoadFrameCount} frames for ${index2}`);
+                for (let i = 1; i <= initialLoadFrameCount; i++) {
+                    const frameImg = new Image();
+                    frameImg.src = baseFramePath + i + ".jpg";
+                    frameImg.onload = () => {
+                        initialImagesLoadedCount++;
+                        // console.log(`Loaded initial frame ${i} for ${index2}. Count: ${initialImagesLoadedCount}`);
+                        if (initialImagesLoadedCount === initialLoadFrameCount) {
+                            console.log(`All initial ${initialLoadFrameCount} frames loaded for ${index2}.`);
+                            loadingMessage.textContent = 'Initial frames loaded! Hover to see full animation.';
+                            img1.classList.add('loaded');
+                            img2.classList.add('loaded');
+                            enableInitialAnimations();
+                        }
+                    };
+                    frameImg.onerror = () => {
+                        console.error(`FAILED to load initial frame: ${frameImg.src} for ${index2}`);
+                        initialImagesLoadedCount++;
+                        if (initialImagesLoadedCount === initialLoadFrameCount) {
+                            console.warn(`Some initial frames failed for ${index2}. Proceeding.`);
+                            loadingMessage.textContent = 'Some initial frames failed to load.';
+                            loadingMessage.style.color = 'orange';
+                            img1.classList.add('loaded');
+                            img2.classList.add('loaded');
+                            enableInitialAnimations();
+                        }
+                    };
+                    preloadedImages[i - 1] = frameImg;
+                }
+
+                function startFullPreload() {
+                    if (fullPreloadStarted) {
+                        console.log(`Full preload already started for ${index2}.`);
+                        return;
+                    }
+                    fullPreloadStarted = true;
+                    console.log(`Starting FULL preload for remaining frames for ${index2}`);
+                    loadingMessage.textContent = 'Loading remaining frames...';
+                    loadingMessage.style.display = 'block';
+
+                    let remainingImagesLoadedCount = 0;
+                    for (let i = initialLoadFrameCount + 1; i <= totalFrames; i++) {
+                        const frameImg = new Image();
+                        frameImg.src = baseFramePath + i + ".jpg";
+                        frameImg.onload = () => {
+                            remainingImagesLoadedCount++;
+                            // console.log(`Loaded remaining frame ${i} for ${index2}. Count: ${remainingImagesLoadedCount}`);
+                            if (remainingImagesLoadedCount === (totalFrames - initialLoadFrameCount)) {
+                                console.log(`All remaining frames loaded for ${index2}.`);
+                                loadingMessage.textContent = 'All frames loaded!';
+                                loadingMessage.style.display = 'none';
+                            }
+                        };
+                        frameImg.onerror = () => {
+                            console.error(`FAILED to load remaining frame: ${frameImg.src} for ${index2}`);
+                            remainingImagesLoadedCount++;
+                            if (remainingImagesLoadedCount === (totalFrames - initialLoadFrameCount)) {
+                                console.warn(`Some remaining frames failed for ${index2}.`);
+                                loadingMessage.textContent = 'Some remaining frames failed to load.';
+                                loadingMessage.style.color = 'orange';
+                            }
+                        };
+                        preloadedImages[i - 1] = frameImg;
+                    }
+                }
+
+                let lastDisplayedFrame_mouse = -1;
+                function updateFrameOnMouseMove(event) {
+                    // console.log(`Mouse move on img1 for ${index2}`); // Log too frequent, uncomment for deep debugging
+                    startFullPreload();
+                    const imgRect = img1.getBoundingClientRect();
+                    const mouseX = event.clientX - imgRect.left;
+                    const percentage = Math.max(0, Math.min(1, mouseX / imgRect.width));
+                    
+                    let newFrame = Math.min(totalFrames, Math.floor(percentage * totalFrames) + 1);
+                    if (!fullPreloadStarted && newFrame > initialLoadFrameCount) {
+                        newFrame = initialLoadFrameCount;
+                    }
+
+                    if (newFrame === lastDisplayedFrame_mouse) {
+                        return;
+                    }
+                    lastDisplayedFrame_mouse = newFrame;
+                    if (preloadedImages[newFrame - 1] && preloadedImages[newFrame - 1].complete) {
+                        img1.src = preloadedImages[newFrame - 1].src;
+                    } else {
+                         // console.warn(`Mouse animation: Frame ${newFrame} for ${index2} not yet complete. Will not update src.`);
+                    }
+                }
+
+                let currentFrame_interval = 1;
+                let animationInterval_id;
+                const frameInterval = 300;
+                function updateFrameOnInterval() {
+                    // console.log(`Interval update for img2 for ${index2}`); // Log too frequent, uncomment for deep debugging
+                    startFullPreload();
+                    currentFrame_interval = (currentFrame_interval % totalFrames) + 1;
+                    
+                    if (!fullPreloadStarted && currentFrame_interval > initialLoadFrameCount) {
+                        currentFrame_interval = 1; // Loop within initial frames (1-30)
+                    }
+
+                    if (preloadedImages[currentFrame_interval - 1] && preloadedImages[currentFrame_interval - 1].complete) {
+                        img2.src = preloadedImages[currentFrame_interval - 1].src;
+                    } else {
+                        // console.warn(`Interval animation: Frame ${currentFrame_interval} for ${index2} not yet complete. Will not update src.`);
+                    }
+                }
+
+                img1.style.pointerEvents = 'none';
+                img2.style.pointerEvents = 'none';
+
+                function enableInitialAnimations() {
+                    console.log(`Enabling initial animations for ${index2}`);
+                    img1.style.pointerEvents = 'auto';
+                    img2.style.pointerEvents = 'auto';
+
+                    img1.addEventListener('mousemove', updateFrameOnMouseMove);
+                    img1.addEventListener('mouseleave', function() {
+                        img1.src = img1.dataset.initialAnimationSrc;
+                        lastDisplayedFrame_mouse = -1;
+                        console.log(`Mouse leave on img1 for ${index2}. Resetting.`);
+                    });
+
+                    img2.addEventListener('mouseenter', function() {
+                        console.log(`Mouse enter on img2 for ${index2}. Starting interval.`);
+                        clearInterval(animationInterval_id);
+                        currentFrame_interval = 0;
+                        updateFrameOnInterval();
+                        animationInterval_id = setInterval(updateFrameOnInterval, frameInterval);
+                    });
+                    img2.addEventListener('mouseleave', function() {
+                        console.log(`Mouse leave on img2 for ${index2}. Stopping interval.`);
+                        clearInterval(animationInterval_id);
+                        img2.src = img2.dataset.initialAnimationSrc;
+                    });
+                }
+            }
+
+            // --- Intersection Observer Logic for Lazy Loading A Elements: ---
+
+            // **Removed redundant 'const' here for maxInitialAnimations as it's declared above.**
+
+            const initialObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    console.log(`InitialObserver callback for ${entry.target.href}. isIntersecting: ${entry.isIntersecting}`);
+                    if (entry.isIntersecting) {
+                        setupAnimationForLink(entry.target);
+                        observer.unobserve(entry.target); // Stop observing once initialized
+                        console.log(`InitialObserver: Unobserving ${entry.target.href}`);
+                    }
+                });
+            }, { root: null, rootMargin: '0px', threshold: 0.1 });
+
+            let nextLinkIndexToObserve = 0; // Correctly declared here for the first time
+            const lazyLoadObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    console.log(`LazyLoadObserver callback for ${entry.target.href}. isIntersecting: ${entry.isIntersecting}`);
+                    // Only trigger if it's the specific target element we're watching for batch loading
+                    if (entry.isIntersecting && entry.target === allLinks[nextLinkIndexToObserve - 1]) {
+                        console.log(`LazyLoadObserver: Triggered for ${entry.target.href}. Loading next batch.`);
+                        observer.unobserve(entry.target); // Stop observing the previous "last" element
+                        loadNextBatchOfLinks();
+                    }
+                });
+            }, { root: null, rootMargin: '200px', threshold: 0 }); // rootMargin makes it load a bit early
+
+            // Function declaration for loadNextBatchOfLinks - moved it up to ensure scope is clear
+            function loadNextBatchOfLinks() {
+                const batchCount = 5; // How many new <a> elements to observe at a time
+                let linksProcessedInBatch = 0;
+                console.log(`loadNextBatchOfLinks called. Next index to observe: ${nextLinkIndexToObserve}`);
+
+                for (let i = nextLinkIndexToObserve; i < allLinks.length; i++) {
+                    if (linksProcessedInBatch >= batchCount) {
+                        console.log(`Batch limit reached (${batchCount}). Stopping for loop.`);
+                        break;
+                    }
+
+                    console.log(`Observing link #${i} (${allLinks[i].href}) with initialObserver.`);
+                    initialObserver.observe(allLinks[i]);
+
+                    // If this is the last link in the overall list OR the last link in the current batch
+                    if (i === allLinks.length - 1 || linksProcessedInBatch === batchCount - 1) {
+                        console.log(`Setting lazyLoadObserver to watch link #${i} (${allLinks[i].href}).`);
+                        lazyLoadObserver.unobserve(allLinks[i]); // Unobserve before re-observing to be safe
+                        lazyLoadObserver.observe(allLinks[i]);
+                    }
+                    linksProcessedInBatch++;
+                    nextLinkIndexToObserve++;
+                }
+
+                // If all links have been observed, disconnect the lazyLoadObserver
+                if (nextLinkIndexToObserve >= allLinks.length) {
+                    console.log("All links have been observed. Disconnecting lazyLoadObserver.");
+                    lazyLoadObserver.disconnect();
+                }
+            }
+
+
+            // --- Initial setup: Observe the first 'maxInitialAnimations' links ---
+            for (let i = 0; i < Math.min(allLinks.length, maxInitialAnimations); i++) {
+                console.log(`Initial loop: Observing link #${i} (${allLinks
